@@ -1,0 +1,1495 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álvaro News</title>
+
+<style>
+:root {
+  --bg: #100b1c;
+  --panel: #1c1230;
+  --panel2: #28183e;
+  --text: #f5edff;
+  --muted: #b9a9ce;
+  --accent: #b66aff;
+  --border: #493064;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  transition: background .25s, color .25s;
+}
+
+body.matrix {
+  --bg: #020b05;
+  --panel: #061a0b;
+  --panel2: #0b2812;
+  --text: #b5ffbd;
+  --muted: #6ecb7b;
+  --accent: #20ff50;
+  --border: #17652a;
+}
+
+body.tsunami {
+  --bg: #071b30;
+  --panel: #103454;
+  --panel2: #17496d;
+  --text: #e5f7ff;
+  --muted: #a8d9ef;
+  --accent: #55c9ff;
+  --border: #286c91;
+}
+
+body.black {
+  --bg: #000;
+  --panel: #111;
+  --panel2: #202020;
+  --text: #fff;
+  --muted: #aaa;
+  --accent: #ddd;
+  --border: #444;
+}
+
+body.white {
+  --bg: #f2f2f2;
+  --panel: #fff;
+  --panel2: #e8e8e8;
+  --text: #171717;
+  --muted: #555;
+  --accent: #7134ad;
+  --border: #ccc;
+}
+
+header {
+  padding: 30px 18px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--panel2), var(--panel));
+  border-bottom: 2px solid var(--accent);
+}
+
+header h1 {
+  margin: 0;
+  font-size: clamp(32px, 7vw, 55px);
+  letter-spacing: 2px;
+}
+
+header p {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 14px;
+  background: var(--panel);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+}
+
+button, .nav-button {
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 10px 15px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: .15s;
+}
+
+button:hover, .nav-button:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: scale(.97);
+}
+
+main {
+  width: min(1050px, 94%);
+  margin: 25px auto;
+}
+
+.page {
+  display: none;
+  animation: appear .2s ease;
+}
+
+.page.active {
+  display: block;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+h2 {
+  color: var(--accent);
+  margin-top: 0;
+}
+
+h3 {
+  margin-bottom: 7px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.news-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 14px 0;
+}
+
+.news-card p {
+  line-height: 1.6;
+}
+
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+.category-filter button.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.team-grid, .achievement-grid, .game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.person, .achievement, .game-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.person strong {
+  display: block;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+
+.achievement.locked {
+  opacity: .55;
+}
+
+.achievement.unlocked {
+  border-color: var(--accent);
+}
+
+.achievement .symbol {
+  font-size: 25px;
+}
+
+select, input[type="text"] {
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+input[type="file"] {
+  max-width: 100%;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  height: auto;
+  background: #080611;
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  margin: 12px auto;
+  touch-action: none;
+}
+
+.game-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.game-description {
+  text-align: center;
+  color: var(--muted);
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 25px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#toast {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  background: var(--panel2);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  padding: 13px 17px;
+  border-radius: 10px;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+
+#toast.show {
+  opacity: 1;
+}
+
+@media(max-width: 600px) {
+  nav {
+    position: static;
+  }
+  .panel {
+    padding: 14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>📰 ÁLVARO NEWS</h1>
+  <p>As notícias mais importantes. E as mais inúteis também.</p>
+</header>
+
+<nav>
+  <button onclick="showPage('home')">Início</button>
+  <button onclick="showPage('news')">Notícias</button>
+  <button onclick="showPage('team')">Equipe</button>
+  <button onclick="showPage('games')">Minigames</button>
+  <button onclick="showPage('achievements')">Conquistas</button>
+  <button onclick="showPage('settings')">Configurações</button>
+</nav>
+
+<main>
+
+<!-- INÍCIO -->
+<section id="home" class="page active">
+  <div class="panel">
+    <h2>Bem-vindo ao Álvaro News!</h2>
+    <p>
+      O portal oficial de notícias, acontecimentos, minigames e outras
+      informações extremamente importantes da nossa comunidade.
+    </p>
+    <p class="muted">
+      Explore as notícias, conheça a equipe, jogue e desbloqueie conquistas!
+    </p>
+    <button onclick="showPage('news')">Ler notícias</button>
+    <button onclick="showPage('games')">Jogar minigames</button>
+  </div>
+
+  <div class="panel">
+    <h2>📌 Destaque</h2>
+    <div class="news-card">
+      <span class="tag">NOTÍCIA EM DESTAQUE</span>
+      <h3>Lançamento do site Álvaro News!</h3>
+      <p>
+        O portal chegou com notícias, configurações, músicas para tocar
+        de fundo, conquistas, minigames e muito mais!
+      </p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>📊 Sobre o portal</h2>
+    <p>Notícias publicadas: <strong id="newsCount">5</strong></p>
+    <p>Conquistas desbloqueadas: <strong id="homeAchievements">0</strong></p>
+    <p>Minigames disponíveis: <strong>4</strong></p>
+  </div>
+</section>
+
+<!-- NOTÍCIAS -->
+<section id="news" class="page">
+  <div class="panel">
+    <h2>📰 Notícias</h2>
+    <p class="muted">Escolha uma categoria ou veja tudo que está acontecendo.</p>
+    <div class="category-filter">
+      <button class="active" onclick="filterNews('all', this)">Todas</button>
+      <button onclick="filterNews('escola', this)">Escola</button>
+      <button onclick="filterNews('recreio', this)">🔥 Resenha do Recreio</button>
+      <button onclick="filterNews('site', this)">Site</button>
+    </div>
+
+    <article class="news-card" data-category="escola" onclick="readNews('politica')">
+      <span class="tag">ESCOLA</span>
+      <h3>Perseguição talvez política é registrada em recreio</h3>
+      <p>Durante o recreio, uma disputa inesperada por um microfone acabou virando assunto. A investigação continua para descobrir se havia mesmo alguma proposta política por trás da confusão.</p>
+      <button onclick="event.stopPropagation(); readNews('politica')">Marcar como lida</button>
+    </article>
+
+    <article class="news-card" data-category="site" onclick="readNews('lancamento')">
+      <span class="tag">SITE</span>
+      <h3>Lançamento do site Álvaro News!</h3>
+      <p>O portal chegou com notícias, configurações, músicas para tocar de fundo, conquistas, minigames e muito mais!</p>
+      <button onclick="event.stopPropagation(); readNews('lancamento')">Marcar como lida</button>
+    </article>
+
+    <article class="news-card" data-category="recreio" onclick="readNews('cocadaina')">
+      <span class="tag">🔥 RESENHA DO RECREIO</span>
+      <h3>Funcionário fabrica a substância chamada “Cocadaína”</h3>
+      <p>Um funcionário teria criado uma substância de nome bastante suspeito: Cocadaína. Segundo o relato, o material seria composto apenas por restos de borracha. O próprio funcionário afirma que, ao sentir o cheiro, fica “doidinho” — mas ninguém mais confirmou esse efeito. A redação reforça: isso é uma invenção absurda da resenha, não uma substância real para experimentar.</p>
+      <button onclick="event.stopPropagation(); readNews('cocadaina')">Marcar como lida</button>
+    </article>
+
+    <article class="news-card" data-category="recreio" onclick="readNews('reviewsCocadaina')">
+      <span class="tag">🔥 RESENHA DO RECREIO</span>
+      <h3>Reviews da Cocadaína: pesquisa revela opiniões inesperadas</h3>
+      <p>Em uma pesquisa estimada com 30 pessoas, as respostas foram: <strong>14</strong> disseram “Preocupante”; <strong>6</strong> perguntaram “Onde compra?”; <strong>9</strong> responderam “q massa mano”; e <strong>1</strong> pessoa disse apenas “Sim.”. O motivo do “Sim.” continua desconhecido, mas a resposta já virou marca registrada. 🔥🔥🔥</p>
+      <button onclick="event.stopPropagation(); readNews('reviewsCocadaina')">Marcar como lida</button>
+    </article>
+
+    <article class="news-card" data-category="escola" onclick="readNews('reviewsEscola')">
+      <span class="tag">ESCOLA</span>
+      <h3>Reviews sobre a escola: pesquisa aponta opiniões fortes</h3>
+      <p>Em uma pesquisa com 56 pessoas, <strong>40</strong> deram avaliações como “desastre”, “lixo”, “merda” ou “bosta”; <strong>3</strong> disseram que é “legal”; e as <strong>13</strong> restantes não responderam. A pesquisa é informal e representa apenas as opiniões de quem participou.</p>
+      <button onclick="event.stopPropagation(); readNews('reviewsEscola')">Marcar como lida</button>
+    </article>
+  </div>
+</section>
+
+<!-- EQUIPE -->
+<section id="team" class="page">
+  <div class="panel">
+    <h2>🎤 Nossa equipe</h2>
+    <div class="team-grid">
+      <div class="person">
+        <strong>Repórteres</strong>
+        Miguel<br>Jean<br>Arthur<br>Arthur R
+      </div>
+      <div class="person">
+        <strong>Cinegrafistas</strong>
+        Lorenzo<br>Cecília<br>Davi Lucas
+      </div>
+      <div class="person">
+        <strong>Redator de manchetes</strong>
+        Lorenzo
+      </div>
+      <div class="person">
+        <strong>Apresentadores</strong>
+        Ana<br>Lorenzo
+      </div>
+      <div class="person">
+        <strong>Programador do site</strong>
+        Lorenzo
+      </div>
+      <div class="person">
+        <strong>Dona do Álvaro News</strong>
+        Ana
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MINIGAMES -->
+<section id="games" class="page">
+  <div class="panel">
+    <h2>🎮 Minigames</h2>
+    <p class="muted">Escolha um jogo e tente bater seu próprio recorde!</p>
+
+    <div class="game-grid">
+      <div class="game-card">
+        <h3>🌊 Mini Wave</h3>
+        <p class="muted">Controle a Wave e desvie dos obstáculos.</p>
+        <button onclick="openGame('wave')">Jogar</button>
+      </div>
+      <div class="game-card">
+        <h3>🐾 Famintoz</h3>
+        <p class="muted">Pegue as comidas com o seu personagem!</p>
+        <button onclick="openGame('famintoz')">Jogar</button>
+      </div>
+      <div class="game-card">
+        <h3>☄️ Desvia do Caos</h3>
+        <p class="muted">Desvie dos objetos que caem do céu.</p>
+        <button onclick="openGame('chaos')">Jogar</button>
+      </div>
+      <div class="game-card">
+        <h3>🐧 Pinguim em Fuga</h3>
+        <p class="muted">Desvie dos blocos e sobreviva o máximo possível!</p>
+        <button onclick="openGame('penguin')">Jogar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MINI WAVE -->
+  <div id="game-wave" class="panel hidden">
+    <h2>🌊 Mini Wave</h2>
+    <p class="game-description">
+      Segure para subir e solte para descer. A Wave fica parada horizontalmente!
+    </p>
+    <canvas id="waveCanvas" width="760" height="300"></canvas>
+    <div class="game-controls">
+      <button id="waveStart">Começar / Reiniciar</button>
+      <button id="waveHold">SEGURAR PARA SUBIR</button>
+      <button onclick="closeGames()">Voltar</button>
+    </div>
+    <p class="game-description" id="waveScore">Pontuação: 0</p>
+    <p class="game-description" id="waveBest">Recorde: 0</p>
+  </div>
+
+  <!-- FAMINTOZ -->
+  <div id="game-famintoz" class="panel hidden">
+    <h2>🐾 Famintoz</h2>
+    <p class="game-description">
+      Mova o mouse para controlar o Famintoz e pegar as comidas!
+    </p>
+    <canvas id="famintozCanvas" width="760" height="300"></canvas>
+    <div class="game-controls">
+      <button id="famintozStart">Começar / Reiniciar</button>
+      <button onclick="closeGames()">Voltar</button>
+    </div>
+    <p class="game-description" id="famintozScore">Comidas: 0</p>
+    <p class="game-description" id="famintozBest">Recorde: 0</p>
+  </div>
+
+  <!-- DESVIA DO CAOS -->
+  <div id="game-chaos" class="panel hidden">
+    <h2>☄️ Desvia do Caos</h2>
+    <p class="game-description">
+      Use as setas ou A e D para desviar dos objetos!
+    </p>
+    <canvas id="chaosCanvas" width="760" height="300"></canvas>
+    <div class="game-controls">
+      <button id="chaosStart">Começar / Reiniciar</button>
+      <button onclick="closeGames()">Voltar</button>
+    </div>
+    <p class="game-description" id="chaosScore">Tempo: 0</p>
+    <p class="game-description" id="chaosBest">Recorde: 0</p>
+  </div>
+
+  <!-- PINGUIM EM FUGA -->
+  <div id="game-penguin" class="panel hidden">
+    <h2>🐧 Pinguim em Fuga</h2>
+    <p class="game-description">No PC: use A/D ou as setas. No celular: arraste o pinguim ou toque no lado esquerdo/direito da arena.</p>
+    <canvas id="penguinCanvas" width="760" height="300"></canvas>
+    <div class="game-controls">
+      <button id="penguinStart">Começar / Reiniciar</button>
+      <button onclick="closeGames()">Voltar</button>
+    </div>
+    <p class="game-description" id="penguinScore">Tempo: 0</p>
+    <p class="game-description" id="penguinBest">Recorde: 0</p>
+  </div>
+</section>
+
+<!-- CONQUISTAS -->
+<section id="achievements" class="page">
+  <div class="panel">
+    <h2>🏆 Conquistas</h2>
+    <p>
+      Desbloqueie conquistas explorando o site, mudando os temas
+      e jogando os minigames.
+    </p>
+    <p>
+      Progresso:
+      <strong id="achievementProgress">0/10</strong>
+    </p>
+    <div class="achievement-grid" id="achievementList"></div>
+  </div>
+</section>
+
+<!-- CONFIGURAÇÕES -->
+<section id="settings" class="page">
+  <div class="panel">
+    <h2>⚙️ Configurações</h2>
+
+    <h3>🎨 Tema do site</h3>
+    <p class="muted">Escolha a aparência do Álvaro News.</p>
+
+    <div class="game-controls">
+      <button onclick="setTheme('night')">🌙 Night</button>
+      <button onclick="setTheme('matrix')">💚 Matrix</button>
+      <button onclick="setTheme('tsunami')">🌊 Tsunami</button>
+      <button onclick="setTheme('black')">⬛ Basic Black</button>
+      <button onclick="setTheme('white')">⬜ Basic White</button>
+    </div>
+
+    <hr style="border-color:var(--border); margin:22px 0;">
+
+    <h3>🎵 Música de fundo</h3>
+    <p class="muted">
+      Selecione um arquivo de áudio do seu computador para tocar enquanto
+      navega pelo site.
+    </p>
+    <input type="file" id="musicFile" accept="audio/*">
+    <br><br>
+    <audio id="backgroundMusic" controls loop style="width:100%"></audio>
+    <br><br>
+    <button onclick="document.getElementById('backgroundMusic').play()">
+      ▶ Tocar
+    </button>
+    <button onclick="document.getElementById('backgroundMusic').pause()">
+      ⏸ Pausar
+    </button>
+    <button onclick="stopMusic()">⏹ Parar música</button>
+  </div>
+
+  <div class="panel">
+    <h2>💾 Dados</h2>
+    <p class="muted">
+      Suas conquistas, recordes e tema ficam salvos neste navegador.
+    </p>
+    <button onclick="resetProgress()">Apagar progresso salvo</button>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>Álvaro News — Informação, entretenimento e acontecimentos duvidosos.</p>
+  <p>Site desenvolvido por Lorenzo.</p>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+// ====================================
+// NAVEGAÇÃO
+// ====================================
+
+const pages = document.querySelectorAll(".page");
+
+function showPage(id) {
+  pages.forEach(page => page.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+
+  if (id === "news") unlock("reader");
+  if (id === "team") unlock("explorer");
+  if (id === "games") unlock("gamer");
+}
+
+function openGame(name) {
+  closeGames();
+  document.getElementById("game-" + name).classList.remove("hidden");
+  unlock("gamer");
+}
+
+function closeGames() {
+  ["wave", "famintoz", "chaos", "penguin"].forEach(name => {
+    document.getElementById("game-" + name).classList.add("hidden");
+  });
+  waveRunning = false;
+  waveHolding = false;
+  famRunning = false;
+  chaosRunning = false;
+  penguinRunning = false;
+}
+
+function filterNews(category, button) {
+  document.querySelectorAll(".category-filter button").forEach(item => item.classList.remove("active"));
+  button.classList.add("active");
+  document.querySelectorAll("#news .news-card").forEach(card => {
+    card.classList.toggle("hidden", category !== "all" && card.dataset.category !== category);
+  });
+}
+
+// ====================================
+// NOTIFICAÇÕES
+// ====================================
+
+let toastTimer;
+
+function toast(message) {
+  const element = document.getElementById("toast");
+  element.textContent = message;
+  element.classList.add("show");
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    element.classList.remove("show");
+  }, 2600);
+}
+
+// ====================================
+// TEMAS
+// ====================================
+
+function setTheme(theme) {
+  document.body.classList.remove(
+    "matrix", "tsunami", "black", "white"
+  );
+
+  if (theme !== "night") {
+    document.body.classList.add(theme);
+  }
+
+  localStorage.setItem("alvaroTheme", theme);
+
+  unlock("customizer");
+  toast("Tema alterado!");
+
+  if (theme === "night") {
+    unlock("night");
+  }
+}
+
+const savedTheme = localStorage.getItem("alvaroTheme") || "night";
+
+document.body.classList.remove(
+  "matrix", "tsunami", "black", "white"
+);
+
+if (savedTheme !== "night") {
+  document.body.classList.add(savedTheme);
+}
+
+// ====================================
+// CONQUISTAS
+// ====================================
+
+const achievements = [
+  {
+    id: "reader",
+    name: "Leitor oficial",
+    description: "Visite a página de notícias.",
+    icon: "📰"
+  },
+  {
+    id: "explorer",
+    name: "Conhecendo a equipe",
+    description: "Visite a página da equipe.",
+    icon: "👥"
+  },
+  {
+    id: "customizer",
+    name: "Personalizador",
+    description: "Mude o tema do site.",
+    icon: "🎨"
+  },
+  {
+    id: "gamer",
+    name: "Hora do jogo!",
+    description: "Entre na página de minigames.",
+    icon: "🎮"
+  },
+  {
+    id: "wave",
+    name: "Wave profissional",
+    description: "Jogue Mini Wave.",
+    icon: "🌊"
+  },
+  {
+    id: "famintoz",
+    name: "Famintoz faminto",
+    description: "Jogue Famintoz.",
+    icon: "🐾"
+  },
+  {
+    id: "chaos",
+    name: "Sobrevivente",
+    description: "Jogue Desvia do Caos.",
+    icon: "☄️"
+  },
+  {
+    id: "night",
+    name: "Noite eterna",
+    description: "Selecione o tema Night.",
+    icon: "🌙"
+  },
+  {
+    id: "politica",
+    name: "Investigador político",
+    description: "Leia a notícia da perseguição.",
+    icon: "🕵️"
+  },
+  {
+    id: "lancamento",
+    name: "Primeiro leitor",
+    description: "Leia a notícia de lançamento.",
+    icon: "🚀"
+  },
+  {
+    id: "cocadaina",
+    name: "Química duvidosa",
+    description: "Leia a notícia da Cocadaína.",
+    icon: "🧪"
+  },
+  {
+    id: "reviewsCocadaina",
+    name: "O voto do Sim.",
+    description: "Leia as reviews da Cocadaína.",
+    icon: "🔥"
+  },
+  {
+    id: "reviewsEscola",
+    name: "Crítico escolar",
+    description: "Leia as reviews sobre a escola.",
+    icon: "📋"
+  },
+  {
+    id: "penguin",
+    name: "Pinguim sobrevivente",
+    description: "Comece uma partida de Pinguim em Fuga.",
+    icon: "🐧"
+  }
+];
+
+let unlocked = JSON.parse(
+  localStorage.getItem("alvaroAchievements") || "[]"
+);
+
+function unlock(id) {
+  if (unlocked.includes(id)) return;
+
+  unlocked.push(id);
+  localStorage.setItem(
+    "alvaroAchievements",
+    JSON.stringify(unlocked)
+  );
+
+  toast("🏆 Conquista desbloqueada!");
+
+  renderAchievements();
+}
+
+function renderAchievements() {
+  const list = document.getElementById("achievementList");
+  list.innerHTML = "";
+
+  achievements.forEach(item => {
+    const done = unlocked.includes(item.id);
+    const card = document.createElement("div");
+
+    card.className = "achievement " +
+      (done ? "unlocked" : "locked");
+
+    card.innerHTML = `
+      <div class="symbol">${done ? item.icon : "🔒"}</div>
+      <h3>${done ? item.name : "???"}</h3>
+      <p class="muted">${done ? item.description : "Conquista bloqueada."}</p>
+      <strong>${done ? "DESBLOQUEADA" : "BLOQUEADA"}</strong>
+    `;
+
+    list.appendChild(card);
+  });
+
+  const amount = unlocked.length;
+  document.getElementById("achievementProgress").textContent =
+    amount + "/" + achievements.length;
+
+  document.getElementById("homeAchievements").textContent = amount;
+}
+
+function readNews(id) {
+  unlock(id);
+  toast("Notícia marcada como lida!");
+}
+
+renderAchievements();
+
+// ====================================
+// MÚSICA
+// ====================================
+
+const musicFile = document.getElementById("musicFile");
+const audio = document.getElementById("backgroundMusic");
+
+musicFile.addEventListener("change", () => {
+  const file = musicFile.files[0];
+  if (!file) return;
+
+  audio.src = URL.createObjectURL(file);
+  audio.play().catch(() => {
+    toast("Arquivo carregado! Aperte em tocar.");
+  });
+});
+
+function stopMusic() {
+  audio.pause();
+  audio.currentTime = 0;
+}
+
+// ====================================
+// MINI WAVE
+// ====================================
+
+const waveCanvas = document.getElementById("waveCanvas");
+const waveCtx = waveCanvas.getContext("2d");
+
+let waveRunning = false;
+let waveDead = false;
+let waveHolding = false;
+let waveFrame = 0;
+let wavePoints = 0;
+let waveY = 150;
+let waveAngle = 0;
+let waveObstacles = [];
+
+const waveX = 160;
+
+// Velocidade vertical reduzida: antes era 8.7.
+const waveSpeed = 7.0;
+
+const waveBestSaved = Number(
+  localStorage.getItem("waveBest") || 0
+);
+
+document.getElementById("waveBest").textContent =
+  "Recorde: " + waveBestSaved;
+
+function startWave() {
+  waveRunning = true;
+  waveDead = false;
+  waveHolding = false;
+  waveFrame = 0;
+  wavePoints = 0;
+  waveY = 150;
+  waveAngle = 0;
+  waveObstacles = [];
+
+  document.getElementById("waveScore").textContent =
+    "Pontuação: 0";
+
+  unlock("wave");
+  requestAnimationFrame(updateWave);
+}
+
+document.getElementById("waveStart").onclick = startWave;
+
+function setWaveHold(value) {
+  waveHolding = value;
+}
+
+const waveHoldButton = document.getElementById("waveHold");
+
+waveHoldButton.addEventListener("pointerdown", e => {
+  e.preventDefault();
+  setWaveHold(true);
+});
+
+waveHoldButton.addEventListener("pointerup", () => setWaveHold(false));
+waveHoldButton.addEventListener("pointerleave", () => setWaveHold(false));
+waveHoldButton.addEventListener("pointercancel", () => setWaveHold(false));
+
+waveCanvas.addEventListener("pointerdown", e => {
+  e.preventDefault();
+  setWaveHold(true);
+});
+
+window.addEventListener("pointerup", () => setWaveHold(false));
+
+window.addEventListener("keydown", e => {
+  if (e.code === "Space" && waveRunning) {
+    e.preventDefault();
+    setWaveHold(true);
+  }
+});
+
+window.addEventListener("keyup", e => {
+  if (e.code === "Space") setWaveHold(false);
+});
+
+function drawWave() {
+  waveCtx.clearRect(0, 0, 760, 300);
+
+  // Fundo quadriculado
+  waveCtx.strokeStyle = "#21152e";
+  waveCtx.lineWidth = 1;
+
+  for (let x = 0; x < 760; x += 30) {
+    waveCtx.beginPath();
+    waveCtx.moveTo(x, 0);
+    waveCtx.lineTo(x, 300);
+    waveCtx.stroke();
+  }
+
+  for (let y = 0; y < 300; y += 30) {
+    waveCtx.beginPath();
+    waveCtx.moveTo(0, y);
+    waveCtx.lineTo(760, y);
+    waveCtx.stroke();
+  }
+
+  // Obstáculos
+  waveCtx.fillStyle = "#ff3e79";
+
+  waveObstacles.forEach(obstacle => {
+    waveCtx.fillRect(obstacle.x, 0, 23, obstacle.gapStart);
+    waveCtx.fillRect(
+      obstacle.x,
+      obstacle.gapStart + obstacle.gapSize,
+      23,
+      300
+    );
+  });
+
+  // Jogador
+  waveCtx.save();
+  waveCtx.translate(waveX, waveY);
+  waveCtx.rotate(waveAngle);
+
+  waveCtx.fillStyle = "#55eaff";
+  waveCtx.shadowColor = "#55eaff";
+  waveCtx.shadowBlur = 12;
+
+  waveCtx.beginPath();
+  waveCtx.moveTo(13, 0);
+  waveCtx.lineTo(-10, -10);
+  waveCtx.lineTo(-10, 10);
+  waveCtx.closePath();
+  waveCtx.fill();
+
+  waveCtx.restore();
+
+  waveCtx.fillStyle = "white";
+  waveCtx.font = "16px Arial";
+  waveCtx.fillText("Pontos: " + wavePoints, 15, 24);
+
+  if (!waveRunning && !waveDead) {
+    waveCtx.fillStyle = "white";
+    waveCtx.font = "24px Arial";
+    waveCtx.fillText("MINI WAVE", 310, 135);
+    waveCtx.font = "14px Arial";
+    waveCtx.fillText("Clique em Começar!", 310, 160);
+  }
+
+  if (waveDead) {
+    waveCtx.fillStyle = "white";
+    waveCtx.font = "30px Arial";
+    waveCtx.fillText("VOCÊ MORREU!", 270, 140);
+    waveCtx.font = "17px Arial";
+    waveCtx.fillText("Pontuação: " + wavePoints, 320, 170);
+  }
+}
+
+function updateWave() {
+  if (!waveRunning) return;
+
+  waveFrame++;
+
+  // A Wave não anda para os lados.
+  // Ela só sobe e desce.
+  const verticalVelocity = waveHolding ? -waveSpeed : waveSpeed;
+
+  waveY += verticalVelocity;
+
+  // O triângulo aponta na direção do movimento.
+  waveAngle = Math.atan2(verticalVelocity, 3.5);
+
+  // Criar obstáculos
+  if (waveFrame % 105 === 0) {
+    const gapStart = 35 + Math.random() * 125;
+
+    waveObstacles.push({
+      x: 780,
+      gapStart: gapStart,
+      gapSize: 115,
+      counted: false
+    });
+  }
+
+  waveObstacles.forEach(obstacle => {
+    obstacle.x -= 3.2;
+
+    if (!obstacle.counted && obstacle.x + 23 < waveX) {
+      obstacle.counted = true;
+      wavePoints++;
+
+      document.getElementById("waveScore").textContent =
+        "Pontuação: " + wavePoints;
+    }
+
+    // Colisão
+    const horizontalCollision =
+      waveX + 10 > obstacle.x &&
+      waveX - 10 < obstacle.x + 23;
+
+    const outsideGap =
+      waveY < obstacle.gapStart ||
+      waveY > obstacle.gapStart + obstacle.gapSize;
+
+    if (horizontalCollision && outsideGap) {
+      endWave();
+    }
+  });
+
+  waveObstacles = waveObstacles.filter(o => o.x > -30);
+
+  if (waveY < 8 || waveY > 292) {
+    endWave();
+  }
+
+  drawWave();
+
+  if (waveRunning) {
+    requestAnimationFrame(updateWave);
+  }
+}
+
+function endWave() {
+  if (!waveRunning) return;
+
+  waveRunning = false;
+  waveDead = true;
+  waveHolding = false;
+
+  const oldBest = Number(localStorage.getItem("waveBest") || 0);
+
+  if (wavePoints > oldBest) {
+    localStorage.setItem("waveBest", wavePoints);
+    document.getElementById("waveBest").textContent =
+      "Recorde: " + wavePoints;
+    toast("🏆 Novo recorde na Mini Wave!");
+  }
+
+  drawWave();
+}
+
+drawWave();
+
+// ====================================
+// FAMINTOZ
+// ====================================
+
+const famCanvas = document.getElementById("famintozCanvas");
+const famCtx = famCanvas.getContext("2d");
+
+let famRunning = false;
+let famX = 380;
+let famY = 240;
+let famFood = [];
+let famScore = 0;
+let famFrame = 0;
+
+document.getElementById("famintozStart").onclick = startFamintoz;
+
+function startFamintoz() {
+  famRunning = true;
+  famX = 380;
+  famY = 240;
+  famFood = [];
+  famScore = 0;
+  famFrame = 0;
+
+  unlock("famintoz");
+
+  document.getElementById("famintozScore").textContent =
+    "Comidas: 0";
+
+  requestAnimationFrame(updateFamintoz);
+}
+
+famCanvas.addEventListener("pointermove", e => {
+  const rect = famCanvas.getBoundingClientRect();
+
+  famX = (e.clientX - rect.left) *
+    (famCanvas.width / rect.width);
+
+  famY = (e.clientY - rect.top) *
+    (famCanvas.height / rect.height);
+});
+
+function updateFamintoz() {
+  if (!famRunning) return;
+
+  famFrame++;
+
+  if (famFrame % 48 === 0) {
+    famFood.push({
+      x: 15 + Math.random() * 730,
+      y: -10,
+      speed: 2 + Math.random() * 2
+    });
+  }
+
+  famFood.forEach(food => {
+    food.y += food.speed;
+
+    const distance = Math.hypot(
+      food.x - famX,
+      food.y - famY
+    );
+
+    if (distance < 25) {
+      food.collected = true;
+      famScore++;
+
+      document.getElementById("famintozScore").textContent =
+        "Comidas: " + famScore;
+    }
+  });
+
+  famFood = famFood.filter(food =>
+    food.y < 320 && !food.collected
+  );
+
+  const famBest = Number(localStorage.getItem("famintozBest") || 0);
+  if (famScore > famBest) {
+    localStorage.setItem("famintozBest", famScore);
+    document.getElementById("famintozBest").textContent = "Recorde: " + famScore;
+  }
+
+  famCtx.clearRect(0, 0, 760, 300);
+
+  famCtx.fillStyle = "#21152e";
+  for (let x = 0; x < 760; x += 30) {
+    famCtx.fillRect(x, 0, 1, 300);
+  }
+
+  famFood.forEach(food => {
+    famCtx.font = "23px Arial";
+    famCtx.fillText("🍎", food.x - 10, food.y + 8);
+  });
+
+  famCtx.font = "28px Arial";
+  famCtx.fillText("🐾", famX - 14, famY + 10);
+
+  famCtx.fillStyle = "white";
+  famCtx.font = "15px Arial";
+  famCtx.fillText("Comidas: " + famScore, 15, 23);
+
+  requestAnimationFrame(updateFamintoz);
+}
+
+// ====================================
+// DESVIA DO CAOS
+// ====================================
+
+const chaosCanvas = document.getElementById("chaosCanvas");
+const chaosCtx = chaosCanvas.getContext("2d");
+
+let chaosRunning = false;
+let chaosX = 380;
+let chaosObjects = [];
+let chaosFrame = 0;
+let chaosScore = 0;
+let chaosLeft = false;
+let chaosRight = false;
+
+document.getElementById("chaosStart").onclick = startChaos;
+
+function startChaos() {
+  chaosRunning = true;
+  chaosX = 380;
+  chaosObjects = [];
+  chaosFrame = 0;
+  chaosScore = 0;
+
+  unlock("chaos");
+
+  document.getElementById("chaosScore").textContent =
+    "Tempo: 0";
+
+  requestAnimationFrame(updateChaos);
+}
+
+window.addEventListener("keydown", e => {
+  if (["ArrowLeft", "KeyA"].includes(e.code)) chaosLeft = true;
+  if (["ArrowRight", "KeyD"].includes(e.code)) chaosRight = true;
+});
+
+window.addEventListener("keyup", e => {
+  if (["ArrowLeft", "KeyA"].includes(e.code)) chaosLeft = false;
+  if (["ArrowRight", "KeyD"].includes(e.code)) chaosRight = false;
+});
+
+function updateChaos() {
+  if (!chaosRunning) return;
+
+  chaosFrame++;
+
+  if (chaosLeft) chaosX -= 6;
+  if (chaosRight) chaosX += 6;
+
+  chaosX = Math.max(15, Math.min(745, chaosX));
+
+  if (chaosFrame % 35 === 0) {
+    chaosObjects.push({
+      x: 15 + Math.random() * 730,
+      y: -20,
+      speed: 2.5 + Math.random() * 2.5,
+      size: 14 + Math.random() * 12
+    });
+  }
+
+  chaosObjects.forEach(object => {
+    object.y += object.speed;
+
+    const distance = Math.hypot(
+      object.x - chaosX,
+      object.y - 265
+    );
+
+    if (distance < object.size + 10) {
+      endChaos();
+    }
+  });
+
+  chaosObjects = chaosObjects.filter(o => o.y < 330);
+
+  chaosScore = Math.floor(chaosFrame / 60);
+
+  document.getElementById("chaosScore").textContent =
+    "Tempo: " + chaosScore + "s";
+
+  chaosCtx.clearRect(0, 0, 760, 300);
+
+  chaosObjects.forEach(object => {
+    chaosCtx.fillStyle = "#ff4d4d";
+    chaosCtx.beginPath();
+    chaosCtx.arc(object.x, object.y, object.size, 0, Math.PI * 2);
+    chaosCtx.fill();
+  });
+
+  chaosCtx.font = "28px Arial";
+  chaosCtx.fillText("🟦", chaosX - 13, 275);
+
+  chaosCtx.fillStyle = "white";
+  chaosCtx.font = "15px Arial";
+  chaosCtx.fillText("Tempo: " + chaosScore + "s", 15, 23);
+
+  if (chaosRunning) {
+    requestAnimationFrame(updateChaos);
+  }
+}
+
+function endChaos() {
+  if (!chaosRunning) return;
+
+  chaosRunning = false;
+
+  const oldBest = Number(localStorage.getItem("chaosBest") || 0);
+
+  if (chaosScore > oldBest) {
+    localStorage.setItem("chaosBest", chaosScore);
+    toast("🏆 Novo recorde no Desvia do Caos!");
+  }
+
+  document.getElementById("chaosBest").textContent =
+    "Recorde: " + Math.max(
+      chaosScore,
+      Number(localStorage.getItem("chaosBest") || 0)
+    );
+
+  chaosCtx.fillStyle = "white";
+  chaosCtx.font = "30px Arial";
+  chaosCtx.fillText("FIM DE JOGO!", 280, 145);
+}
+
+document.getElementById("chaosBest").textContent =
+  "Recorde: " + Number(localStorage.getItem("chaosBest") || 0);
+
+document.getElementById("famintozBest").textContent =
+  "Recorde: " + Number(localStorage.getItem("famintozBest") || 0);
+
+// ====================================
+// PINGUIM EM FUGA
+// ====================================
+
+const penguinCanvas = document.getElementById("penguinCanvas");
+const penguinCtx = penguinCanvas.getContext("2d");
+let penguinRunning = false;
+let penguinX = 380;
+let penguinBlocks = [];
+let penguinFrame = 0;
+let penguinScore = 0;
+let penguinLeft = false;
+let penguinRight = false;
+let penguinPointerActive = false;
+
+function drawPenguin() {
+  penguinCtx.clearRect(0, 0, 760, 300);
+  penguinCtx.fillStyle = "#14243b";
+  penguinCtx.fillRect(0, 0, 760, 300);
+  penguinCtx.strokeStyle = "#263e5d";
+  for (let x = 0; x < 760; x += 38) {
+    penguinCtx.beginPath(); penguinCtx.moveTo(x, 0); penguinCtx.lineTo(x, 300); penguinCtx.stroke();
+  }
+  penguinBlocks.forEach(block => {
+    penguinCtx.fillStyle = "#ff6b6b";
+    penguinCtx.fillRect(block.x, block.y, block.size, block.size);
+    penguinCtx.fillStyle = "rgba(255,255,255,.2)";
+    penguinCtx.fillRect(block.x + 4, block.y + 4, block.size - 8, 5);
+  });
+  penguinCtx.font = "32px Arial";
+  penguinCtx.textAlign = "center";
+  penguinCtx.fillText("🐧", penguinX, 276);
+  penguinCtx.textAlign = "left";
+  penguinCtx.fillStyle = "white";
+  penguinCtx.font = "16px Arial";
+  penguinCtx.fillText("Tempo: " + penguinScore + "s", 15, 24);
+  if (!penguinRunning) {
+    penguinCtx.font = "24px Arial";
+    penguinCtx.textAlign = "center";
+    penguinCtx.fillText("PINGUIM EM FUGA", 380, 130);
+    penguinCtx.font = "15px Arial";
+    penguinCtx.fillText("Aperte Começar!", 380, 157);
+    penguinCtx.textAlign = "left";
+  }
+}
+
+function startPenguin() {
+  penguinRunning = true;
+  penguinX = 380;
+  penguinBlocks = [];
+  penguinFrame = 0;
+  penguinScore = 0;
+  document.getElementById("penguinScore").textContent = "Tempo: 0";
+  unlock("penguin");
+  requestAnimationFrame(updatePenguin);
+}
+
+document.getElementById("penguinStart").addEventListener("click", startPenguin);
+
+function movePenguinPointer(e) {
+  const rect = penguinCanvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (penguinCanvas.width / rect.width);
+  penguinX = Math.max(22, Math.min(738, x));
+}
+
+penguinCanvas.addEventListener("pointerdown", e => {
+  penguinPointerActive = true;
+  movePenguinPointer(e);
+});
+penguinCanvas.addEventListener("pointermove", e => {
+  if (penguinPointerActive) movePenguinPointer(e);
+});
+window.addEventListener("pointerup", () => penguinPointerActive = false);
+
+window.addEventListener("keydown", e => {
+  if (["ArrowLeft", "KeyA"].includes(e.code)) penguinLeft = true;
+  if (["ArrowRight", "KeyD"].includes(e.code)) penguinRight = true;
+});
+window.addEventListener("keyup", e => {
+  if (["ArrowLeft", "KeyA"].includes(e.code)) penguinLeft = false;
+  if (["ArrowRight", "KeyD"].includes(e.code)) penguinRight = false;
+});
+
+function updatePenguin() {
+  if (!penguinRunning) return;
+  penguinFrame++;
+  if (penguinLeft) penguinX -= 6;
+  if (penguinRight) penguinX += 6;
+  penguinX = Math.max(22, Math.min(738, penguinX));
+
+  if (penguinFrame % Math.max(18, 42 - Math.floor(penguinScore / 5)) === 0) {
+    const size = 22 + Math.random() * 18;
+    penguinBlocks.push({ x: Math.random() * (760 - size), y: -size, size, speed: 2.8 + Math.random() * 2.1 + penguinScore * 0.025 });
+  }
+
+  let hit = false;
+  penguinBlocks.forEach(block => {
+    block.y += block.speed;
+    const closeX = Math.abs((block.x + block.size / 2) - penguinX) < block.size / 2 + 13;
+    const closeY = Math.abs((block.y + block.size / 2) - 263) < block.size / 2 + 12;
+    if (closeX && closeY) hit = true;
+  });
+  penguinBlocks = penguinBlocks.filter(block => block.y < 320);
+  penguinScore = Math.floor(penguinFrame / 60);
+  document.getElementById("penguinScore").textContent = "Tempo: " + penguinScore + "s";
+
+  if (hit) {
+    endPenguin();
+    return;
+  }
+  drawPenguin();
+  requestAnimationFrame(updatePenguin);
+}
+
+function endPenguin() {
+  penguinRunning = false;
+  const oldBest = Number(localStorage.getItem("penguinBest") || 0);
+  if (penguinScore > oldBest) {
+    localStorage.setItem("penguinBest", penguinScore);
+    toast("🏆 Novo recorde no Pinguim em Fuga!");
+  }
+  document.getElementById("penguinBest").textContent = "Recorde: " + Math.max(oldBest, penguinScore) + "s";
+  drawPenguin();
+  penguinCtx.fillStyle = "white";
+  penguinCtx.font = "26px Arial";
+  penguinCtx.textAlign = "center";
+  penguinCtx.fillText("FIM DE JOGO!", 380, 190);
+  penguinCtx.textAlign = "left";
+}
+
+document.getElementById("penguinBest").textContent = "Recorde: " + Number(localStorage.getItem("penguinBest") || 0) + "s";
+drawPenguin();
+
+// ====================================
+// RESET
+// ====================================
+
+function resetProgress() {
+  const confirmation = confirm(
+    "Tem certeza que deseja apagar suas conquistas e recordes?"
+  );
+
+  if (!confirmation) return;
+
+  localStorage.removeItem("alvaroAchievements");
+  localStorage.removeItem("waveBest");
+  localStorage.removeItem("famintozBest");
+  localStorage.removeItem("chaosBest");
+  localStorage.removeItem("penguinBest");
+
+  unlocked = [];
+
+  renderAchievements();
+
+  document.getElementById("waveBest").textContent = "Recorde: 0";
+  document.getElementById("famintozBest").textContent = "Recorde: 0";
+  document.getElementById("chaosBest").textContent = "Recorde: 0";
+  document.getElementById("penguinBest").textContent = "Recorde: 0s";
+
+  toast("Progresso apagado!");
+}
+</script>
+
+</body>
+</html>
